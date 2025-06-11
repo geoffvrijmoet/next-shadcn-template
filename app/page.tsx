@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Clock, Users } from "lucide-react";
+import TemplateSuggestions from "@/components/TemplateSuggestions";
 
 export default function HomePage() {
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     metric1: 42,
     metric2: 128,
     metric3: 24.5,
@@ -81,6 +82,9 @@ export default function HomePage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Template Suggestions Section */}
+      <TemplateSuggestions />
     </div>
   );
 }
