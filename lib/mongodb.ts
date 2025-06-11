@@ -4,7 +4,11 @@ const uri = process.env.MONGODB_URI;
 const dbName = 'next-shadcn-template';
 
 if (!uri) {
-  throw new Error('Please add your Mongo URI to .env.local');
+  throw new Error('Please add your Mongo URI to .env.local or Vercel environment variables');
+}
+
+if (!uri.startsWith('mongodb://') && !uri.startsWith('mongodb+srv://')) {
+  throw new Error('Invalid MongoDB URI format. Must start with mongodb:// or mongodb+srv://');
 }
 
 let client: MongoClient;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { TemplateSuggestion } from '@/lib/models/TemplateSuggestion';
 
 interface TemplateSuggestionsProps {
@@ -18,7 +18,7 @@ export default function TemplateSuggestions({ initialSuggestions = [] }: Templat
     category: 'all'
   });
 
-  const fetchSuggestions = async () => {
+  const fetchSuggestions = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -41,13 +41,13 @@ export default function TemplateSuggestions({ initialSuggestions = [] }: Templat
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter.status, filter.category]);
 
   useEffect(() => {
     if (initialSuggestions.length === 0) {
       fetchSuggestions();
     }
-  }, [filter]);
+  }, [filter, fetchSuggestions, initialSuggestions.length]);
 
   const getPriorityBadgeColor = (priority: string) => {
     switch (priority) {
