@@ -6,12 +6,36 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 
 *AI agents: Treat items in this section as your task list. Remove completed items and add new ones as needed.*
 
+- [ ] Integrations backend: Design database schema (Prisma + PostgreSQL) for integrations and evidence graph
+- [ ] API routes for managing integrations
+- [ ] Server-side evidence ingestion workers (placeholder)
+- [ ] Implement authentication-protected API endpoints for gaps and policies
+- [ ] Flesh out Settings page with organization profile, API keys, billing info
+- [ ] Replace dummy data in Dashboard with real API calls once backend is ready
+
 <!-- Example format for new tasks:
 - [ ] **Task Title**: Description of what needs to be done
 - [ ] **Question**: What specific functionality should be implemented?
 -->
 
 ## 📋 Recently Completed Tasks
+
+### ✅ Compliance Dashboard Skeleton (Latest)
+**Description**: Added initial UI skeleton for compliance platform including integrations grid, gap table, and policy generator.
+
+**Files Created/Modified**:
+- `app/dashboard/page.tsx` - Main compliance dashboard page
+- `components/IntegrationStatusCard.tsx` - Reusable card for integration connection status
+- `components/GapTable.tsx` - Table listing control gaps
+- `components/PolicyGenerator.tsx` - Interactive policy generator widget
+- `app/settings/page.tsx` - Placeholder settings route
+- `components/main-nav.tsx` (existing) - Already included /dashboard and /settings links
+
+**Architecture Details**:
+- **Integrations Grid**: Displays connection status for GitHub, AWS, etc. Supports connect/disconnect actions (stubbed handlers)
+- **Control Gaps**: Table visualizing unresolved compliance gaps with severity coloring
+- **Policy Generator**: Simulates policy generation progress with Tailwind progress bar and button interactions
+- **Routing**: Middleware continues to enforce authentication for all non-public routes, so dashboard is protected
 
 ### ✅ Unauthorized Sign-In Page & Cursor Rules (Latest)
 **Description**: Created unauthorized sign-in page for Clerk security redirects and comprehensive cursor rules for business management system.
