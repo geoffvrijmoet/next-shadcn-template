@@ -66,6 +66,21 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 - **Data Flow**: External apps → POST API → MongoDB → GET API → React component → UI
 - **Key Features**: Filtering, pagination, priority badges, code examples, responsive design
 
+### ✅ MongoDB Infrastructure & TypeScript Fixes (Latest)
+**Description**: Added MongoDB models for `integrations` and `evidence`, authentication helper, and addressed TypeScript config issues.
+
+**Files Created/Modified**:
+- `next-env.d.ts` - Ensures React/Node/Next types
+- `lib/models/Integration.ts` - Mongo collection + helpers
+- `lib/models/Evidence.ts` - Mongo collection + helpers
+- `lib/auth.ts` - Helper to obtain org identifier from Clerk
+- `components/*`, `app/dashboard/page.tsx`, `components/PolicyGenerator.tsx` - Typing refinements
+
+**Architecture Details**:
+- **Integrations Collection**: `{ orgId, name, status, config, lastSyncedAt }` with unique index on `(orgId, name)`
+- **Evidence Collection**: `{ orgId, integrationId, controlId, description, artifactPath, collectedAt }` indexed on `orgId`, `integrationId`, `controlId`
+- **Auth Helper**: `requireOrg()` centralises retrieval of `orgId || userId` for DB access guards
+
 ---
 
 ## 🏗️ Web App Architecture Guide

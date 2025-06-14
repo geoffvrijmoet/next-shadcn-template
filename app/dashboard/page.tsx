@@ -6,7 +6,7 @@ import GapTable from "@/components/GapTable";
 import PolicyGenerator from "@/components/PolicyGenerator";
 
 export default function DashboardPage() {
-  const [integrations, setIntegrations] = useState([
+  const [integrations, setIntegrations] = useState<{ name: string; description: string; status: 'connected' | 'disconnected' | 'error'; }[]>([
     {
       name: 'GitHub',
       description: 'Source code hosting',
@@ -25,14 +25,14 @@ export default function DashboardPage() {
   ]);
 
   const handleConnect = (name: string) => {
-    setIntegrations((prev) =>
-      prev.map((i) => (i.name === name ? { ...i, status: 'connected' } : i))
+    setIntegrations((prev: typeof integrations) =>
+      prev.map((i) => (i.name === name ? { ...i, status: 'connected' } as typeof integrations[number] : i))
     );
   };
 
   const handleDisconnect = (name: string) => {
-    setIntegrations((prev) =>
-      prev.map((i) => (i.name === name ? { ...i, status: 'disconnected' } : i))
+    setIntegrations((prev: typeof integrations) =>
+      prev.map((i) => (i.name === name ? { ...i, status: 'disconnected' } as typeof integrations[number] : i))
     );
   };
 

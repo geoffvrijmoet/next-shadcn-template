@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
 export default function PolicyGenerator() {
-  const [generating, setGenerating] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [generating, setGenerating] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
 
   const handleGenerate = () => {
     setGenerating(true);
@@ -13,7 +13,7 @@ export default function PolicyGenerator() {
 
     // Fake progress for demo purposes
     const interval = setInterval(() => {
-      setProgress((prev) => {
+      setProgress((prev: number) => {
         if (prev >= 100) {
           clearInterval(interval);
           setGenerating(false);
