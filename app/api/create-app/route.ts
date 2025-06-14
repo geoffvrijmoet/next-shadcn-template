@@ -5,6 +5,7 @@ import { VercelService } from '@/lib/services/vercel';
 import { MongoDBService } from '@/lib/services/mongodb';
 import { ClerkService } from '@/lib/services/clerk';
 import { GoogleCloudService } from '@/lib/services/google-cloud';
+import { deploymentEventBus } from '@/lib/deployment-events';
 
 interface CreateAppRequest {
   projectName: string;
@@ -184,6 +185,19 @@ async function initiateDeployment(
         },
       }
     );
+
+    // Emit to event bus
+    deploymentEventBus.emit({
+      deploymentId,
+      stepId,
+      status: data.status ?? 'unknown',
+      message: data.message,
+      data: {
+        startedAt: data.startedAt,
+        completedAt: data.completedAt,
+        error: data.error,
+      },
+    });
   }
 
   // 1. Create GitHub repository

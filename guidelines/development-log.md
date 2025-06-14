@@ -22,7 +22,7 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
   - ~~Create MongoDB Atlas API integration for database setup~~ ✅
   - Implement Clerk API integration for auth project creation
   - ~~Add Google Cloud API integration for project setup~~ ✅
-  - Create real-time WebSocket updates for deployment progress
+  - ~~Create real-time WebSocket updates for deployment progress~~ ✅
   - Implement error handling and rollback capabilities
   - Add template system for different app types
   - Come up with lots of cursor rules for the project that would help it succeed with the use of AI agents
@@ -246,6 +246,17 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 - Requires `GOOGLE_CLIENT_EMAIL` & `GOOGLE_PRIVATE_KEY` env vars (service account with Cloud Platform scope).
 - Generates unique projectId, creates project via Cloud Resource Manager API, stores `googleCloudProjectId`.
 - Step treated as optional; failures mark step error but do not fail entire deployment.
+
+### ✅ Real-time Deployment Updates (Latest)
+**Description**: Added Server-Sent Events endpoint to stream step updates to the UI.
+
+**Files Added/Modified**:
+- `lib/deployment-events.ts` – Lightweight in-memory event bus.
+- `app/api/deployments/[id]/events/route.ts` – SSE endpoint (`text/event-stream`).
+- `app/api/create-app/route.ts` – Emits progress on each `updateStep` via event bus.
+
+**Usage**:
+Client can open `EventSource('/api/deployments/<deploymentId>/events')` and receive JSON `DeploymentEvent` objects as steps progress.
 
 ---
 
