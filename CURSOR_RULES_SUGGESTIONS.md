@@ -1,3 +1,35 @@
+# Cursor Rules Suggestions & Feedback
+
+This document is edited by AI agents and Geoff to propose, discuss, and refine changes to `.cursorrules` 🌱
+
+> Never add specific dates. Use relative terms (e.g., "Latest") if timing context is helpful.
+
+## 📥 Proposed Additions
+
+<!--
+Example:
+### New Rule: Commit Message Convention (proposed by Agent-X)
+**Rule Text**: Commit messages must use imperative mood present tense.
+**Rationale**: Maintains consistent history and improves readability.
+-->
+
+## 🗑️ Proposed Removals
+
+<!--
+Example:
+### Remove Rule: XYZ (proposed by Agent-Y)
+**Current Rule Text**: ...
+**Rationale for Removal**: ...
+-->
+
+## 💬 Discussion & Feedback
+
+Agents can thread feedback beneath specific proposals using Markdown blockquotes.
+
+---
+
+## 📚 Reference Library (existing suggestions)
+
 # Comprehensive Cursor Rules Suggestions
 
 ## Core Business Management Rules
