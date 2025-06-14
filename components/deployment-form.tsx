@@ -17,6 +17,8 @@ export function DeploymentForm() {
   const [config, setConfig] = useState<Partial<DeploymentConfig>>({
     template: 'nextjs-shadcn',
     github: {
+      token: '',
+      username: '',
       private: false
     }
   });
@@ -491,7 +493,7 @@ export function DeploymentForm() {
           onClick={() => {
             setConfig({
               template: 'nextjs-shadcn',
-              github: { private: false }
+              github: { token: '', username: '', private: false }
             });
             setDeploymentResult(null);
             setProgress([]);
