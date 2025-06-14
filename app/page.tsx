@@ -1,90 +1,35 @@
-'use client';
+import { DeploymentForm } from '@/components/deployment-form';
+import { APIKeySetup } from '@/components/api-key-setup';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Clock, Users } from "lucide-react";
-import TemplateSuggestions from "@/components/TemplateSuggestions";
-
-export default function HomePage() {
-  const [stats] = useState({
-    metric1: 42,
-    metric2: 128,
-    metric3: 24.5,
-    metric4: 8
-  });
-
+export default function Home() {
   return (
-    <div className="space-y-8">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Web App Generator
+          </h1>
+          <p className="text-xl text-gray-600">
+            Deploy full-stack applications with one click
+          </p>
+        </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Metric 1</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.metric1}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Metric 2</CardTitle>
-            <BarChart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.metric2}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Metric 3</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.metric3}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Metric 4</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.metric4}</div>
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="setup" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="setup">API Setup</TabsTrigger>
+            <TabsTrigger value="deploy">Deploy App</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="setup" className="mt-6">
+            <APIKeySetup />
+          </TabsContent>
+          
+          <TabsContent value="deploy" className="mt-6">
+            <DeploymentForm />
+          </TabsContent>
+        </Tabs>
       </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              No data available.
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              No data available.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Template Suggestions Section */}
-      <TemplateSuggestions />
-    </div>
+    </main>
   );
 }

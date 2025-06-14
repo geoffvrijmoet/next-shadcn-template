@@ -10,6 +10,7 @@ interface TemplateSuggestionsProps {
 export default function TemplateSuggestions({ initialSuggestions = [] }: TemplateSuggestionsProps) {
   const [suggestions, setSuggestions] = useState<TemplateSuggestion[]>(initialSuggestions);
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [filter, setFilter] = useState<{
     status: string;
     category: string;
@@ -18,7 +19,13 @@ export default function TemplateSuggestions({ initialSuggestions = [] }: Templat
     category: 'all'
   });
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const fetchSuggestions = useCallback(async () => {
+    if (!mounted) return;
+    
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -41,13 +48,28 @@ export default function TemplateSuggestions({ initialSuggestions = [] }: Templat
     } finally {
       setLoading(false);
     }
-  }, [filter.status, filter.category]);
+  }, [filter.status, filter.category, mounted]);
 
   useEffect(() => {
-    if (initialSuggestions.length === 0) {
+    if (mounted && initialSuggestions.length === 0) {
       fetchSuggestions();
     }
-  }, [filter, fetchSuggestions, initialSuggestions.length]);
+  }, [filter, fetchSuggestions, initialSuggestions.length, mounted]);
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return (
+      <div className="w-full max-w-6xl p-6">
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-light mb-2">Template Suggestions</h2>
+          <p className="text-gray-600">Community suggestions for improving this Next.js + shadcn/ui template</p>
+        </div>
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </div>
+    );
+  }
 
   const getPriorityBadgeColor = (priority: string) => {
     switch (priority) {
@@ -69,11 +91,11 @@ export default function TemplateSuggestions({ initialSuggestions = [] }: Templat
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-2">Template Suggestions</h2>
-        <p className="text-gray-600">Community suggestions for improving this Next.js + shadcn/ui template</p>
-      </div>
+    <div className="w-full max-w-6xl p-6">
+              <div className="mb-8 text-center">
+          <h2 className="text-3xl font-light mb-2">Template Suggestions</h2>
+          <p className="text-gray-600">Community suggestions for improving this Next.js + shadcn/ui template</p>
+        </div>
 
       {/* Filters */}
       <div className="mb-6 flex flex-wrap gap-4">

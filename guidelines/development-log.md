@@ -6,12 +6,112 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 
 *AI agents: Treat items in this section as your task list. Remove completed items and add new ones as needed.*
 
-<!-- Example format for new tasks:
-- [ ] **Task Title**: Description of what needs to be done
-- [ ] **Question**: What specific functionality should be implemented?
--->
+- [ ] **services that i think we should templatize**: i have certain services that i like to use across all my projects (depending on need). perhaps we should start the process of getting boilerplate code up and running for these services. i'll list them below. i think we should work hard to test any boilerplate code we create, and make sure it's working as expected.
+  - Resend for contact forms / email in general
+  - Clerk for auth
+  - Stripe for payments
+  - MongoDB for database
+  - Vercel for deployment
+  - GitHub for repository
+  - Google Cloud for SSO
+  - Cloudinary for image storage
+
+- [ ] **🔧 Web App Generator - Core Infrastructure**: Complete the infrastructure orchestration for the web app generator:
+  - Implement GitHub API integration for repository creation
+  - Add Vercel API integration for automated deployments
+  - Create MongoDB Atlas API integration for database setup
+  - Implement Clerk API integration for auth project creation
+  - Add Google Cloud API integration for project setup
+  - Create real-time WebSocket updates for deployment progress
+  - Implement error handling and rollback capabilities
+  - Add template system for different app types
+  - Come up with lots of cursor rules for the project that would help it succeed with the use of AI agents
+
+  - [ ] **focuses of the holding company**: Road-map to reach the $1 B goal with a single human employee (Geoff) and an army of AI agents
+    - [ ] **AI-Agent Platform**
+      - [ ] Bootstrap **Agent SDK**  
+        - [ ] Decide on runtime (Node vs Python) & package structure  
+        - [ ] Implement shared modules: memory (vector + kv), secret management, logging wrapper, retry/scheduling helper.  
+        - [ ] Publish as private NPM package `@hc/agent-sdk` and add example agent.
+      - [ ] **Agent-Builder Agent**  
+        - [ ] Prompt design for "agent spec → file tree plan"  
+        - [ ] Use `@hc/agent-sdk` to output runnable TypeScript agent skeleton  
+        - [ ] Write integration tests that create a dummy "HelloWorld Agent".
+      - [ ] **Infrastructure Agent**  
+        - [ ] Implement GitHub repo creation via existing GitHub service  
+        - [ ] Add Vercel project provisioning  
+        - [ ] Hook into Mongo multi-cluster utility for DB creation  
+        - [ ] Expose REST endpoint `/api/infra-agent` for orchestration.
+      - [ ] **Marketing & Distribution Agent**  
+        - [ ] OAuth flow for Twitter/X & LinkedIn  
+        - [ ] Template prompts for launch tweets/posts  
+        - [ ] Product Hunt API wrapper  
+        - [ ] MVP: schedule & post launch tweet set from config.
+    - [ ] **Internal Toolkit (this Next.js project)**
+      - [ ] Cursor-First UI  
+        - [ ] Audit pages/components still browser-dependent  
+        - [ ] Create `/components/CursorHint` to render actionable comments inside dev-log  
+        - [ ] Migrate Create-App success screen to dev-log update instead of modal.
+        - [ ] **Slim Create-App page** to minimal agent trigger form  
+          - [ ] Fields: project name, description, services list, cluster key  
+          - [ ] Single "Run Infrastructure Agent" button (calls `/api/create-app`)  
+          - [ ] WebSocket log viewer for real-time deployment output.  
+        - [ ] **Dev-log command interface**  
+          - [ ] Define YAML/markdown block format (e.g., `### new-app`)  
+          - [ ] Parser agent that converts block → `/api/create-app` call  
+          - [ ] Document usage example in development log.
+      - [ ] **Idea Generator**  
+        - [ ] Dataset: scrape HackerNews, IndieHackers, PH trending; store in Mongo  
+        - [ ] Scheduled job that rates ideas with GPT using holding-company criteria  
+        - [ ] UI/table to browse & approve ideas.
+      - [ ] **Spawn Agent Wizard**  
+        - [ ] Form to collect agent name + goal + required APIs  
+        - [ ] Calls Agent-Builder agent and commits new folder under `agents/`  
+        - [ ] Auto-register agent in dashboard.
+    - [ ] **Agency / Client Services Arm**
+      - [ ] **Client On-boarding Workflow**  
+        - [ ] Clerk role "client" + invite flow  
+        - [ ] e-signature integration (DocuSign) for contracts  
+        - [ ] Agent triggers project scaffolding on contract sign.
+      - [ ] Service Packaging  
+        - [ ] Config schema for per-client API keys + limits  
+        - [ ] CLI to deploy infra agent + marketing agent with that config.
+      - [ ] **KPI Dashboard**  
+        - [ ] Define metrics: MRR, CAC, agent compute cost, human hours saved  
+        - [ ] ETL pipeline into Mongo + simple Next.js `/analytics` page.
+
+  - [ ] **idea for ai agent: "rule generator / critiquer"**: we could have an ai agent which comes up with rules for a project, and then another ai agent which critiques the rules and gives feedback on them or suggestions for how they could be improved. we could use this to help us create better rules for our projects.
 
 ## 📋 Recently Completed Tasks
+
+### ✅ Web App Generator Foundation (Latest)
+**Description**: Created the foundational structure for a complete web app generator system that can create new applications with full infrastructure through our interface.
+
+**Files Created/Modified**:
+- `app/create-app/page.tsx` - Complete form interface for app creation with progress tracking
+- `app/api/create-app/route.ts` - API endpoint for handling app creation requests
+- `lib/models/Deployment.ts` - TypeScript interfaces for deployment system
+- `components/main-nav.tsx` - Added "Create App" navigation link
+- `components/ui/card.tsx` - Added missing CardDescription component
+- `components/ui/textarea.tsx` - Added textarea component via shadcn
+- `components/ui/badge.tsx` - Added badge component via shadcn
+
+**Architecture Details**:
+- **Frontend Interface**: Complete form with project details, template selection, feature toggles
+- **Real-time Progress**: Visual progress tracking with deployment steps and status indicators
+- **API Structure**: RESTful endpoint with validation, error handling, and deployment orchestration
+- **Database Models**: Comprehensive TypeScript interfaces for tracking deployments
+- **Template System**: Configurable templates for different types of applications (Next.js, SaaS, E-commerce, Blog)
+- **Feature Selection**: Modular feature system allowing users to choose integrations (Auth, Database, Payments, etc.)
+
+**Current Implementation Status**:
+- ✅ User Interface: Complete form with validation and progress tracking
+- ✅ API Foundation: Basic endpoint structure with validation
+- ✅ Type Definitions: Comprehensive TypeScript interfaces
+- ✅ Navigation Integration: Added to main navigation
+- 🔄 Infrastructure APIs: Placeholders for GitHub, Vercel, MongoDB, Clerk, Google Cloud
+- 🔄 Real-time Updates: Simulated progress (WebSocket integration needed)
+- 🔄 Template Generation: Template selection UI (actual generation pending)
 
 ### ✅ Unauthorized Sign-In Page & Cursor Rules (Latest)
 **Description**: Created unauthorized sign-in page for Clerk security redirects and comprehensive cursor rules for business management system.
@@ -24,6 +124,30 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 - **Security Page**: Clean, accessible design with proper error messaging and user guidance
 - **Cursor Rules**: Comprehensive rules covering business logic, multi-project management, template generation, security, and AI interaction patterns
 - **Business Context**: Rules designed specifically for a holding company management system that generates project templates
+
+### ✅ MongoDB Multi-Cluster Support (Recent)
+**Description**: Refactored MongoDB utility to allow multiple Atlas clusters via `MONGODB_CLUSTERS` env variable and added cluster selection to Create-App flow.
+
+**Files Created/Modified**:
+- `lib/mongodb.ts` – Refactored to parse JSON cluster map, cache client promises per cluster, and expose `getDatabase(clusterKey, dbName)`.
+- `app/create-app/page.tsx` – Added target cluster select field and validation.
+- `app/api/create-app/route.ts` – Accepts `targetCluster` and validates it.
+
+**Architecture Details**:
+- **Environment Variable**: `MONGODB_CLUSTERS` holds a JSON object mapping cluster keys (e.g. `"geoff-vrijmoet-com"`) to connection strings that omit the database segment. Falls back to legacy `MONGODB_URI`.
+- **Connection Pooling**: Shared Map caches `MongoClient` promises per base URI enabling reuse across clusters.
+- **Create-App Flow**: Frontend lets user choose the desired cluster; API receives `targetCluster` for future deployment orchestration.
+
+### ✅ Web App Generator UI Enhancements (Recent)
+**Description**: Implemented auto-fill GitHub repo name and updated Project Name placeholder.
+
+**Files Modified**:
+- `app/create-app/page.tsx` – Added dynamic cluster fetch, auto GitHub repo generation, placeholder update.
+- `app/api/clusters/route.ts` – New endpoint returning available cluster keys.
+
+**Architecture Details**:
+- On mount, create-app page fetches `/api/clusters` to populate cluster list dynamically from `MONGODB_CLUSTERS`.
+- GitHub repository field auto-populates based on sanitized Project Name until user edits repo field manually.
 
 ### ✅ Template Suggestions System
 **Description**: Implemented a complete system for collecting and displaying suggestions from other web applications.
@@ -41,6 +165,29 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 - **API Endpoints**: `/api/suggestions` (POST for submit, GET for fetch)
 - **Data Flow**: External apps → POST API → MongoDB → GET API → React component → UI
 - **Key Features**: Filtering, pagination, priority badges, code examples, responsive design
+
+### ✅ Services Selection Hierarchy (Recent)
+**Description**: Reworked services section with nested Google sub-services, removed Uploadthing & Vercel Analytics, added Cloudflare Video.
+
+**Files Modified**:
+- `app/create-app/page.tsx` – Introduced hierarchical services list, parent/child selection logic.
+
+**Architecture Details**:
+- Parent "Google" checkbox selects/deselects all underlying Google APIs children.
+- Features stored as flat strings array in form state; helper functions manage nested toggling.
+
+### ✅ AI Cursor Rules Generation (Recent)
+**Description**: Integrated OpenAI (o3) to auto-generate Cursor rules from project description on Create-App page.
+
+**Files Added/Modified**:
+- `app/api/generate-cursor-rules/route.ts` – Server route calling OpenAI chat completion and returning cleaned rules.
+- `app/create-app/page.tsx` – Debounced description watcher, fetches generated rules, shows preview card.
+- `package.json` – Added `openai` dependency.
+
+**Architecture Details**:
+- Requires `OPENAI_SECRET_KEY` env variable (already set).
+- Uses `gpt-4o-mini` model with custom system prompt, returns 5-10 bullet rules.
+- Rules are displayed for user review; future step can store them into guidelines.
 
 ---
 

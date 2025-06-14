@@ -1,11 +1,7 @@
 import { ClerkProvider } from '@clerk/nextjs'
-import { Inter } from 'next/font/google'
 import { UserButton } from "@clerk/nextjs";
 import { MainNav } from "@/components/main-nav";
-import { MobileNav } from "@/components/mobile-nav";
 import './globals.css'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export default function RootLayout({
   children,
@@ -14,19 +10,24 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={inter.className}>
+      <html lang="en" className="font-liter">
+        <head>
+          <link
+            href="https://fonts.googleapis.com/css2?family=Liter:wght@400&display=swap"
+            rel="stylesheet"
+          />
+        </head>
+        <body className="font-light">
           <div className="flex min-h-screen flex-col">
             <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-              <div className="container flex h-14 items-center">
-                <MainNav />
-                <MobileNav className="md:hidden" />
-                <div className="flex flex-1 items-center justify-end space-x-4">
-                  <UserButton afterSignOutUrl="/" />
+              <div className="container flex h-14 items-center justify-center">
+                <MainNav className="mx-auto" />
+                <div className="absolute right-6">
+                  <UserButton />
                 </div>
               </div>
             </header>
-            <main className="flex-1 container py-6">{children}</main>
+            <main className="flex-1">{children}</main>
           </div>
         </body>
       </html>
