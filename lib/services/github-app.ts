@@ -20,6 +20,27 @@ export interface GitHubInstallation {
   repositories_url: string;
 }
 
+export interface InstallationRepository {
+  id: number;
+  name: string;
+  full_name: string;
+  html_url: string;
+  clone_url: string;
+  ssh_url: string;
+}
+
+export interface InstallationWebhookPayload {
+  action: string;
+  installation: {
+    id: number;
+    account: {
+      login: string;
+    };
+    // Other fields are ignored for now
+  };
+  repositories?: unknown[];
+}
+
 export class GitHubAppService {
   private appId: string;
   private privateKey: string;
@@ -87,7 +108,7 @@ export class GitHubAppService {
       private: boolean;
       owner?: string; // For org repos
     }
-  ): Promise<any> {
+  ): Promise<import('./github').GitHubRepository> {
     try {
       // Get installation-specific Octokit instance
       const installationOctokit = await this.getInstallationOctokit(installationId);
@@ -169,7 +190,7 @@ export class GitHubAppService {
   /**
    * Handle installation webhook
    */
-  async handleInstallationWebhook(payload: any): Promise<void> {
+  async handleInstallationWebhook(payload: InstallationWebhookPayload): Promise<void> {
     const { action, installation } = payload;
 
     switch (action) {
@@ -195,11 +216,11 @@ export class GitHubAppService {
   /**
    * Get repositories accessible by an installation
    */
-  async getInstallationRepositories(installationId: number): Promise<any[]> {
+  async getInstallationRepositories(installationId: number): Promise<InstallationRepository[]> {
     try {
       const installationOctokit = await this.getInstallationOctokit(installationId);
       const { data } = await installationOctokit.apps.listReposAccessibleToInstallation();
-      return data.repositories;
+      return data.repositories as InstallationRepository[];
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Failed to get installation repositories: ${errorMessage}`);
@@ -246,7 +267,7 @@ export class GitHubAppService {
   /**
    * Store installation in database (implement based on your database)
    */
-  private async storeInstallation(installation: any): Promise<void> {
+  private async storeInstallation(installation: { id: number }): Promise<void> {
     // TODO: Implement database storage
     console.log('Storing installation:', installation.id);
   }

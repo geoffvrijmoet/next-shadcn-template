@@ -185,7 +185,7 @@ export class DeploymentOrchestrator {
       repoName: config.projectName,
       description: config.description,
       private: config.github.private,
-      template: config.template
+      templateId: config.template
     };
 
     return await github.createRepository(repoConfig);

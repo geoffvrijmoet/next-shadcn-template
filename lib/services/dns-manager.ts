@@ -13,6 +13,20 @@ export interface DNSProvider {
   updateRecord(domain: string, recordId: string, record: Partial<DNSRecord>): Promise<void>;
 }
 
+// Internal helper types for external API responses
+interface CloudflareAPIRecord {
+  id: string;
+  type: string;
+  name: string;
+  content: string;
+  ttl: number;
+  priority?: number;
+}
+
+interface GoogleDnsAnswer {
+  data: string;
+}
+
 /**
  * Namecheap DNS API Service
  */
@@ -74,9 +88,8 @@ export class NamecheapDNS implements DNSProvider {
       throw new Error(`Namecheap DNS error: ${response.statusText}`);
     }
 
-    // Parse XML response and extract records
-    const xmlText = await response.text();
-    // Note: This is a simplified implementation - you'd need to parse the XML properly
+    // Parse XML response and extract records (placeholder – implement XML parsing as needed)
+    await response.text();
     return [];
   }
 
@@ -185,8 +198,8 @@ export class CloudflareDNS implements DNSProvider {
     }
 
     const data = await response.json();
-    return data.result.map((record: any) => ({
-      type: record.type,
+    return (data.result as CloudflareAPIRecord[]).map((record) => ({
+      type: record.type as DNSRecord['type'],
       name: record.name,
       value: record.content,
       ttl: record.ttl,
@@ -286,7 +299,7 @@ export class DNSManager {
         const response = await fetch(`https://dns.google/resolve?name=${record.name}.${domain}&type=${record.type}`);
         const data = await response.json();
         
-        if (!data.Answer || !data.Answer.some((answer: any) => answer.data === record.value)) {
+        if (!data.Answer || !data.Answer.some((answer: GoogleDnsAnswer) => answer.data === record.value)) {
           return false;
         }
       }

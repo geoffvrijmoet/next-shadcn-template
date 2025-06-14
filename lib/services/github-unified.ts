@@ -15,6 +15,19 @@ export interface UnifiedGitHubRepository {
   sshUrl: string;
 }
 
+export interface RepositoryContentItem {
+  name: string;
+  path: string;
+  type: 'file' | 'dir' | 'symlink' | 'submodule';
+  sha: string;
+  size: number;
+  url: string;
+  html_url: string;
+  git_url: string;
+  download_url: string | null;
+  [key: string]: unknown;        // keeps the interface flexible
+}
+
 export class UnifiedGitHubService {
   private patService?: GitHubService;
   private appService?: GitHubAppService;
@@ -96,10 +109,19 @@ export class UnifiedGitHubService {
   /**
    * Get available repositories (for app users)
    */
-  async getAccessibleRepositories(): Promise<any[]> {
+  async getAccessibleRepositories(): Promise<UnifiedGitHubRepository[]> {
     if (this.authType === 'app' && this.appService && this.installationId) {
-      return await this.appService.getInstallationRepositories(this.installationId);
+      const repos = await this.appService.getInstallationRepositories(this.installationId);
+      return repos.map((repo: { id: number; name: string; full_name: string; html_url: string; clone_url: string; ssh_url: string }) => ({
+        id: repo.id,
+        name: repo.name,
+        fullName: repo.full_name,
+        htmlUrl: repo.html_url,
+        cloneUrl: repo.clone_url,
+        sshUrl: repo.ssh_url,
+      }));
     }
+    // For PAT, user has access to all their repos through GitHub UI; return empty list as not applicable
     return []; // For PAT, user has access to all their repos
   }
 

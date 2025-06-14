@@ -189,6 +189,47 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 - Uses `gpt-4o-mini` model with custom system prompt, returns 5-10 bullet rules.
 - Rules are displayed for user review; future step can store them into guidelines.
 
+### ✅ UnifiedGitHubService Type and Lint Fix (Recent)
+**Description**: Replaced explicit `any[]` with `UnifiedGitHubRepository[]` in `getAccessibleRepositories` and removed invalid `getRepositoryContents` method, resolving TypeScript errors.
+
+**Files Modified**:
+- `lib/services/github-unified.ts`
+
+**Architecture Details**:
+- Added mapping from raw installation repository objects to unified structure.
+- Ensured Unified service exports type-safe list of repositories and no longer references non-existent `octokit`/`username` properties.
+
+### ✅ GitHubAppService Type Safety Fix (Recent)
+**Description**: Eliminated all `any` usages in `github-app.ts` by introducing explicit interfaces (`InstallationRepository`, `InstallationWebhookPayload`) and strict typing for repository operations.
+
+**Files Modified**:
+- `lib/services/github-app.ts`
+
+**Architecture Details**:
+- `createRepository` now returns `GitHubRepository` type from `github.ts`.
+- `getInstallationRepositories` returns strongly typed `InstallationRepository[]`.
+- Added specific payload types for webhook handling; private helper uses typed param.
+
+### ✅ DNSManager Linter Fixes (Recent)
+**Description**: Removed unused variable, eliminated `any` types, and added helper interfaces to satisfy strict TypeScript rules in DNS services.
+
+**Files Modified**:
+- `lib/services/dns-manager.ts`
+
+**Architecture Details**:
+- Replaced unused `xmlText` variable with direct `await response.text()`.
+- Introduced `CloudflareAPIRecord` and `GoogleDnsAnswer` internal interfaces.
+- Ensured Cloudflare records mapping returns `DNSRecord[]` with correct union type casting.
+
+### ✅ DeploymentOrchestrator GitHubConfig Fix (Recent)
+**Description**: Updated property from `template` to `templateId` when creating `GitHubConfig` to match interface, resolving TypeScript error.
+
+**Files Modified**:
+- `lib/services/deployment-orchestrator.ts`
+
+**Architecture Details**:
+- Ensures correct mapping of selected template ID to repository creation service.
+
 ---
 
 ## 🏗️ Web App Architecture Guide

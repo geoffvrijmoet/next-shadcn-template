@@ -19,6 +19,20 @@ export interface GitHubRepository {
   sshUrl: string;
 }
 
+export interface RepositoryContentItem {
+  name: string;
+  path: string;
+  type: 'file' | 'dir' | 'symlink' | 'submodule';
+  sha: string;
+  size: number;
+  url: string;
+  html_url: string;
+  git_url: string;
+  download_url: string | null;
+  // Allow additional fields returned by the GitHub API without losing type‐safety
+  [key: string]: unknown;
+}
+
 export class GitHubService {
   private octokit: Octokit;
   private username: string;
@@ -178,7 +192,7 @@ export class GitHubService {
   /**
    * Get repository contents
    */
-  async getRepositoryContents(repoName: string, path: string = ''): Promise<any[]> {
+  async getRepositoryContents(repoName: string, path: string = ''): Promise<RepositoryContentItem[]> {
     try {
       const { data } = await this.octokit.repos.getContent({
         owner: this.username,
@@ -186,7 +200,10 @@ export class GitHubService {
         path,
       });
 
-      return Array.isArray(data) ? data : [data];
+      // Ensure the return type is always an array for easier consumption by callers
+      return Array.isArray(data)
+        ? (data as RepositoryContentItem[])
+        : ([data as RepositoryContentItem]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Failed to get repository contents: ${errorMessage}`);
