@@ -13,12 +13,42 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { type DeploymentConfig, type DeploymentResult, type DeploymentProgress } from '@/lib/services/deployment-orchestrator';
 
+// Form-friendly version of DeploymentConfig with optional nested fields
+interface FormConfig {
+  projectName?: string;
+  description?: string;
+  template: DeploymentConfig['template'];
+  github: {
+    token?: string;
+    username?: string;
+    private: boolean;
+  };
+  vercel?: {
+    token?: string;
+    teamId?: string;
+  };
+  mongodb?: {
+    apiKey?: string;
+    privateKey?: string;
+    orgId?: string;
+    region?: string;
+    tier?: string;
+    provider?: 'AWS' | 'GCP' | 'AZURE';
+  };
+  clerk?: {
+    secretKey?: string;
+  };
+  domain?: string;
+}
+
 export function DeploymentForm() {
-  const [config, setConfig] = useState<Partial<DeploymentConfig>>({
+  const [config, setConfig] = useState<FormConfig>({
     template: 'nextjs-shadcn',
     github: {
-      private: false
-    }
+      token: '',
+      username: '',
+      private: false,
+    },
   });
   
   const [isDeploying, setIsDeploying] = useState(false);
@@ -46,7 +76,8 @@ export function DeploymentForm() {
       const result: DeploymentResult = await response.json();
       
       if (!response.ok) {
-        throw new Error(result.error || 'Deployment failed');
+        interface ErrorResponse { error?: string }
+        throw new Error((result as ErrorResponse).error ?? 'Deployment failed');
       }
 
       setDeploymentResult(result);
@@ -59,13 +90,14 @@ export function DeploymentForm() {
     }
   };
 
-  const isValidConfig = (config: Partial<DeploymentConfig>): config is DeploymentConfig => {
+  const isValidConfig = (cfg: FormConfig): cfg is DeploymentConfig => {
+    // Narrow type by asserting required fields present
     return !!(
-      config.projectName &&
-      config.description &&
-      config.github?.token &&
-      config.github?.username &&
-      config.vercel?.token
+      cfg.projectName &&
+      cfg.description &&
+      cfg.github.token &&
+      cfg.github.username &&
+      cfg.vercel?.token
     );
   };
 
@@ -398,7 +430,7 @@ export function DeploymentForm() {
                   <Label htmlFor="mongoProvider">Provider</Label>
                   <Select 
                     value={config.mongodb?.provider} 
-                    onValueChange={(value: any) => setConfig({
+                    onValueChange={(value: 'AWS' | 'GCP' | 'AZURE') => setConfig({
                       ...config, 
                       mongodb: {...config.mongodb, provider: value}
                     })}
@@ -432,7 +464,7 @@ export function DeploymentForm() {
                 <Label htmlFor="mongoTier">Tier</Label>
                 <Select 
                   value={config.mongodb?.tier} 
-                  onValueChange={(value: any) => setConfig({
+                  onValueChange={(value: string) => setConfig({
                     ...config, 
                     mongodb: {...config.mongodb, tier: value}
                   })}
@@ -491,7 +523,7 @@ export function DeploymentForm() {
           onClick={() => {
             setConfig({
               template: 'nextjs-shadcn',
-              github: { private: false }
+              github: { token: '', username: '', private: false },
             });
             setDeploymentResult(null);
             setProgress([]);
