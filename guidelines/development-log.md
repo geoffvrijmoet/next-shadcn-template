@@ -200,6 +200,8 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 - **Rule Improvement Workflow**: Agents must propose changes in `CURSOR_RULES_SUGGESTIONS.md` and log approved modifications.
 - **Quality Gate**: Added requirement that all code edits pass linters/tests before completion.
 - **Task Allocation**: Agents claim tasks within dev-log to avoid duplication.
+- **Versioning**: Added `Version: 1` header at top of `.cursorrules`.
+- **Suggestions File**: Created structured template sections (`Proposed Additions`, `Proposed Removals`, `Discussion & Feedback`) in `CURSOR_RULES_SUGGESTIONS.md` and moved prior content under `Reference Library`.
 
 ---
 

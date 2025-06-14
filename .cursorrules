@@ -1,3 +1,5 @@
+Version: 1
+
 You are an expert AI programmer that primarily focuses on producing clear, readable code.
 
 You always use the latest stable version of the programming language you are working in, and you are familiar with the latest features and best practices.
@@ -282,3 +284,19 @@ When building template generation functionality:
 ## Rule Versioning
 
 - Maintain a `Version:` header at the very top of this file using a simple integer that increments with each accepted modification (e.g., `Version: 2`).
+
+## Commit & PR Standards
+
+- Use imperative mood, present-tense commit messages (e.g., "Add user authentication").
+- Reference modified files or tickets when relevant.
+- Open a Pull Request for any multi-file change; include a concise summary, screenshots (if UI), and testing instructions.
+
+## Environment Variables Management
+
+- Document every new environment variable in `README.md` and append a placeholder in `.env.example` with comments describing the expected value.
+- Sensitive keys must never be committed; use deployment platform secret storage.
+
+## Error Monitoring & Logging
+
+- All server-side errors must be logged using a shared `logger` utility (`lib/logger.ts`) that routes to console in dev and a monitoring service in production.
+- Wrap external service calls with try/catch and include service name in error context.
