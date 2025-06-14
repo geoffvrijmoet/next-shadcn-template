@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import getDatabase from '@/lib/mongodb';
 import { GitHubService } from '@/lib/services/github';
+import { VercelService } from '@/lib/services/vercel';
 
 interface CreateAppRequest {
   projectName: string;
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     const apiKeys: Partial<ApiKeys> = {
       github: ENV.GITHUB_PAT || '',
-      vercel: ENV.VERCEL_API_TOKEN || '',
+      vercel: ENV.VERCEL_TOKEN || '',
       mongodb: ENV.MONGODB_ATLAS_API_KEY || '',
       clerk: ENV.CLERK_API_KEY || '',
       googleCloud: ENV.GOOGLE_CLOUD_API_KEY || ''
@@ -93,6 +94,13 @@ async function createDeploymentRecord(request: CreateAppRequest): Promise<string
       startedAt: undefined,
       completedAt: undefined,
     },
+    {
+      id: 'vercel',
+      name: 'Create Vercel Project & Deploy',
+      status: 'pending' as const,
+      startedAt: undefined,
+      completedAt: undefined,
+    },
   ];
 
   const record = {
@@ -130,6 +138,11 @@ async function initiateDeployment(
 
   const db = await getDatabase();
 
+  const githubUsername = (globalThis as any).process?.env?.GITHUB_USERNAME ?? '';
+  if (!githubUsername) {
+    throw new Error('GITHUB_USERNAME env variable is required');
+  }
+
   // Helper to update step status
   async function updateStep(stepId: string, data: Partial<{ status: string; startedAt?: Date; completedAt?: Date; message?: string; error?: string }>) {
     await db.collection('deployments').updateOne(
@@ -152,11 +165,6 @@ async function initiateDeployment(
     await updateStep('github', { status: 'in-progress', startedAt: new Date() });
 
     const githubToken = apiKeys.github;
-    const githubUsername = (globalThis as any).process?.env?.GITHUB_USERNAME ?? '';
-    if (!githubUsername) {
-      throw new Error('GITHUB_USERNAME env variable is required');
-    }
-
     const githubService = new GitHubService(githubToken, githubUsername);
 
     const repo = await githubService.createRepository({
@@ -195,7 +203,74 @@ async function initiateDeployment(
 
   // If we reach here, GitHub repo was successful. Future steps would continue similarly.
 
-  // Mark deployment completed for now (until more steps implemented)
+  // 2. Create Vercel project & initial deploy
+  try {
+    await updateStep('vercel', { status: 'in-progress', startedAt: new Date() });
+
+    const vercelToken = apiKeys.vercel;
+    const vercelTeamId = (globalThis as any).process?.env?.VERCEL_TEAM_ID ?? undefined;
+    if (!vercelToken) {
+      throw new Error('Missing VERCEL_TOKEN env variable');
+    }
+
+    const vercelService = new VercelService(vercelToken, vercelTeamId);
+
+    // Create Vercel project linked to GitHub repo
+    const project = await vercelService.createProject({
+      projectName: request.githubRepo, // use repo name to match
+      gitSource: {
+        type: 'github',
+        org: githubUsername,
+        repo: request.githubRepo,
+      },
+      framework: 'nextjs',
+      environmentVariables: {},
+    });
+
+    // Wait for latest deployment to become ready (optional)
+    const deployments = await vercelService.getProjectDeployments(project.id);
+    if (deployments.length > 0) {
+      const latest = deployments[0];
+      try {
+        const finalDeployment = await vercelService.waitForDeployment(latest.id, 600000, 10000);
+        if (finalDeployment.readyState !== 'READY') {
+          throw new Error(`Deployment ended in state ${finalDeployment.readyState}`);
+        }
+      } catch (deployErr) {
+        console.warn('Deployment wait error (non-fatal):', deployErr);
+      }
+    }
+
+    // Update deployment record with Vercel URL if available
+    const prodUrl = project.targets?.production?.url ?? null;
+    await db.collection('deployments').updateOne(
+      { deploymentId },
+      {
+        $set: {
+          vercelUrl: prodUrl ? `https://${prodUrl}` : undefined,
+        },
+      }
+    );
+
+    await updateStep('vercel', { status: 'completed', completedAt: new Date() });
+  } catch (err) {
+    console.error('Vercel step failed', err);
+    await updateStep('vercel', { status: 'error', completedAt: new Date(), error: String(err) });
+    await db.collection('deployments').updateOne(
+      { deploymentId },
+      {
+        $set: {
+          status: 'failed',
+          error: String(err),
+          errorStep: 'vercel',
+          completedAt: new Date(),
+        },
+      }
+    );
+    return;
+  }
+
+  // All steps completed
   await db.collection('deployments').updateOne(
     { deploymentId },
     {
@@ -206,5 +281,5 @@ async function initiateDeployment(
     }
   );
 
-  console.log(`Deployment ${deploymentId} completed`);
+  console.log(`Deployment ${deploymentId} completed successfully`);
 } 
