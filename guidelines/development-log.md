@@ -230,6 +230,16 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 **Architecture Details**:
 - Ensures correct mapping of selected template ID to repository creation service.
 
+### ✅ Create-App API Linter Fix (Recent)
+**Description**: Resolved unused variable errors by ignoring destructured `key` and marking placeholder `_apiKeys` as intentionally unused.
+
+**Files Modified**:
+- `app/api/create-app/route.ts`
+
+**Architecture Details**:
+- Used `[, value]` destructuring in filter to avoid unused variable.
+- Added `void _apiKeys;` inside `initiateDeployment` to mark upcoming usage.
+
 ---
 
 ## 🏗️ Web App Architecture Guide

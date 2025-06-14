@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const body: CreateAppRequest = await request.json();
     
     // Validate required fields
-    const { projectName, description, template, githubRepo, targetCluster, features } = body;
+    const { projectName, description, template, githubRepo, targetCluster } = body;
     
     if (!projectName || !description || !template || !githubRepo || !targetCluster) {
       return NextResponse.json(
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     };
 
     const missingKeys = Object.entries(apiKeys)
-      .filter(([key, value]) => !value)
+      .filter(([, value]) => !value)
       .map(([key]) => key);
 
     if (missingKeys.length > 0) {
@@ -96,8 +96,9 @@ async function createDeploymentRecord(request: CreateAppRequest): Promise<string
 async function initiateDeployment(
   deploymentId: string, 
   request: CreateAppRequest, 
-  apiKeys: ApiKeys
+  _apiKeys: ApiKeys
 ) {
+  void _apiKeys; // currently unused – will be utilized in future implementation
   // This will be the main orchestration function
   // It will run in the background and update the deployment status
   
