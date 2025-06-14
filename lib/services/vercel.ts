@@ -258,4 +258,13 @@ export class VercelService {
 
     return response.json();
   }
+
+  async deleteProject(projectId: string): Promise<void> {
+    try {
+      await this.makeRequest(`/v10/projects/${projectId}`, 'DELETE');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.warn(`Failed to delete Vercel project ${projectId}: ${errorMessage}`);
+    }
+  }
 } 
