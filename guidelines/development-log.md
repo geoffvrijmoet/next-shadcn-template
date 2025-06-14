@@ -21,7 +21,7 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
   - ~~Add Vercel API integration for automated deployments~~ ✅
   - ~~Create MongoDB Atlas API integration for database setup~~ ✅
   - Implement Clerk API integration for auth project creation
-  - Add Google Cloud API integration for project setup
+  - ~~Add Google Cloud API integration for project setup~~ ✅
   - Create real-time WebSocket updates for deployment progress
   - Implement error handling and rollback capabilities
   - Add template system for different app types
@@ -234,6 +234,18 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 - **ClerkService**: Utilized client to create instance, configure defaults, generate publishable & secret keys.
 - **Environment**: Requires `CLERK_API_KEY` env var.
 - **Deployment Record**: Stores `clerkApplicationId`, `clerkPublishableKey`, `clerkSecretKey` and step status.
+
+### ✅ Google Cloud Project Setup (Latest)
+**Description**: Added Google Cloud project creation step using service-account credentials.
+
+**Files Modified**:
+- `lib/services/google-cloud.ts` – New service using googleapis to create projects & enable APIs.
+- `app/api/create-app/route.ts` – Added `google` step, projectId generation, and record updates.
+
+**Architecture Details**:
+- Requires `GOOGLE_CLIENT_EMAIL` & `GOOGLE_PRIVATE_KEY` env vars (service account with Cloud Platform scope).
+- Generates unique projectId, creates project via Cloud Resource Manager API, stores `googleCloudProjectId`.
+- Step treated as optional; failures mark step error but do not fail entire deployment.
 
 ---
 

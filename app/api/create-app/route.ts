@@ -4,6 +4,7 @@ import { GitHubService } from '@/lib/services/github';
 import { VercelService } from '@/lib/services/vercel';
 import { MongoDBService } from '@/lib/services/mongodb';
 import { ClerkService } from '@/lib/services/clerk';
+import { GoogleCloudService } from '@/lib/services/google-cloud';
 
 interface CreateAppRequest {
   projectName: string;
@@ -113,6 +114,13 @@ async function createDeploymentRecord(request: CreateAppRequest): Promise<string
     {
       id: 'clerk',
       name: 'Create Clerk Application',
+      status: 'pending' as const,
+      startedAt: undefined,
+      completedAt: undefined,
+    },
+    {
+      id: 'google',
+      name: 'Setup Google Cloud Project',
       status: 'pending' as const,
       startedAt: undefined,
       completedAt: undefined,
@@ -415,6 +423,45 @@ async function initiateDeployment(
       }
     );
     return;
+  }
+
+  // 5. Setup Google Cloud project (optional)
+  try {
+    await updateStep('google', { status: 'in-progress', startedAt: new Date() });
+
+    const gcpEmail = ENV.GOOGLE_CLIENT_EMAIL as string | undefined;
+    const gcpPrivateKey = (ENV.GOOGLE_PRIVATE_KEY as string | undefined)?.replace(/\\n/g, '\n');
+    if (!gcpEmail || !gcpPrivateKey) {
+      throw new Error('Missing Google service account credentials (GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY)');
+    }
+
+    const googleService = new GoogleCloudService(gcpEmail, gcpPrivateKey);
+
+    const projectIdBase = request.projectName.toLowerCase().replace(/[^a-z0-9-]+/g, '-')
+      .replace(/^-+|-+$/g, '').slice(0, 25);
+    const uniqueSuffix = Math.random().toString(36).substr(2, 4);
+    const projectId = `${projectIdBase}-${uniqueSuffix}`;
+
+    await googleService.createProject({
+      projectId,
+      projectName: request.projectName,
+      enableApis: [],
+    });
+
+    await db.collection('deployments').updateOne(
+      { deploymentId },
+      {
+        $set: {
+          googleCloudProjectId: projectId,
+        },
+      }
+    );
+
+    await updateStep('google', { status: 'completed', completedAt: new Date() });
+  } catch (err) {
+    console.error('Google Cloud step failed', err);
+    await updateStep('google', { status: 'error', completedAt: new Date(), error: String(err) });
+    // Do not fail entire deployment if GCP creds missing — treat as optional
   }
 
   // All steps completed
