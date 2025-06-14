@@ -255,3 +255,30 @@ When building template generation functionality:
 
 - make a concerted effort to come up with rules that enable better, more useful rule-making.
 - make rule suggestions very often.
+
+## Multi-Agent Collaboration & Rule Improvement
+
+- The `.cursorrules` file is living documentation; any AI agent may propose improvements when relevant to their task.
+- Proposed rule changes must be recorded in `CURSOR_RULES_SUGGESTIONS.md` under "Proposed Additions" along with a brief rationale before being applied.
+- Once a proposal is approved (explicit user consent or majority agent consensus recorded in the development log), update `.cursorrules` and document the change in `guidelines/development-log.md` under "Recently Completed Tasks".
+- Do not delete an existing rule unless it is marked obsolete and the removal is approved by the human owner.
+- Each rule must be concise, actionable, and non-conflicting with the rest of the rule-set.
+
+## Multi-Agent Task Allocation
+
+- Before beginning work, agents must claim an open task by adding their agent identifier in parentheses after the bullet in the development log.
+- If an agent discovers a blocking dependency, they should add a new To-Do bullet describing the prerequisite work and pause their current task until it is resolved.
+
+## Quality Gate for Generated Code
+
+- All code edits must pass ESLint, TypeScript, and project test suites before being considered complete.
+- New functionality must be accompanied by relevant unit or integration tests when feasible.
+- Public API or environment variable changes require updates to README and other affected documentation.
+
+## Human Override
+
+- The single human stakeholder (Geoff) may override any rule at any time. Agents must comply immediately and update the rules to reflect the override.
+
+## Rule Versioning
+
+- Maintain a `Version:` header at the very top of this file using a simple integer that increments with each accepted modification (e.g., `Version: 2`).
