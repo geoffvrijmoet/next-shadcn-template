@@ -17,7 +17,7 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
   - Cloudinary for image storage
 
 - [ ] **🔧 Web App Generator - Core Infrastructure**: Complete the infrastructure orchestration for the web app generator:
-  - Implement GitHub API integration for repository creation
+  - ~~Implement GitHub API integration for repository creation~~ ✅
   - Add Vercel API integration for automated deployments
   - Create MongoDB Atlas API integration for database setup
   - Implement Clerk API integration for auth project creation
@@ -188,6 +188,18 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 - Requires `OPENAI_SECRET_KEY` env variable (already set).
 - Uses `gpt-4o-mini` model with custom system prompt, returns 5-10 bullet rules.
 - Rules are displayed for user review; future step can store them into guidelines.
+
+### ✅ GitHub Repository Integration (Latest)
+**Description**: Added full GitHub repository creation step to the Web App Generator deployment pipeline. The API now creates a private repo via GitHub PAT, stores deployment records in MongoDB, and updates progress tracking.
+
+**Files Modified**:
+- `app/api/create-app/route.ts` – Implemented GitHub repository creation, MongoDB deployment tracking, step updates, and error handling.
+
+**Architecture Details**:
+- **Deployment Orchestration**: `create-app` endpoint now records deployments in the `deployments` collection and executes the GitHub step immediately.
+- **GitHub Service**: Utilises existing `GitHubService` to create repos for the authenticated user.
+- **Progress Tracking**: Each deployment stores step metadata (`pending` → `in-progress` → `completed`).
+- **Error Handling**: Failures update the deployment record with `status: failed` and error details.
 
 ---
 
