@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import getDatabase from '@/lib/mongodb';
 import { GitHubService } from '@/lib/services/github';
 import { VercelService } from '@/lib/services/vercel';
+import { MongoDBService } from '@/lib/services/mongodb';
 
 interface CreateAppRequest {
   projectName: string;
@@ -101,6 +102,13 @@ async function createDeploymentRecord(request: CreateAppRequest): Promise<string
       startedAt: undefined,
       completedAt: undefined,
     },
+    {
+      id: 'mongodb',
+      name: 'Provision MongoDB Atlas Cluster',
+      status: 'pending' as const,
+      startedAt: undefined,
+      completedAt: undefined,
+    },
   ];
 
   const record = {
@@ -137,6 +145,8 @@ async function initiateDeployment(
   console.log('Initiating deployment:', deploymentId, request.projectName);
 
   const db = await getDatabase();
+
+  const ENV = (globalThis as any).process?.env ?? {};
 
   const githubUsername = (globalThis as any).process?.env?.GITHUB_USERNAME ?? '';
   if (!githubUsername) {
@@ -263,6 +273,82 @@ async function initiateDeployment(
           status: 'failed',
           error: String(err),
           errorStep: 'vercel',
+          completedAt: new Date(),
+        },
+      }
+    );
+    return;
+  }
+
+  // 3. Provision MongoDB Atlas cluster
+  try {
+    await updateStep('mongodb', { status: 'in-progress', startedAt: new Date() });
+
+    const mongoPublicKey = apiKeys.mongodb; // public API key retrieved earlier
+    const mongoPrivateKey = (ENV.MONGODB_PRIVATE_KEY || '') as string;
+    const mongoOrgId = (ENV.MONGODB_ORG_ID || '') as string;
+
+    if (!mongoPublicKey || !mongoPrivateKey || !mongoOrgId) {
+      throw new Error('Missing MongoDB Atlas API credentials (MONGODB_ATLAS_API_KEY, MONGODB_PRIVATE_KEY, MONGODB_ORG_ID)');
+    }
+
+    const mongoService = new MongoDBService(mongoPublicKey, mongoPrivateKey);
+
+    // 3.1 Create Project (if not existing) – project names must be unique inside Org
+    const atlasProject = await mongoService.createProject(request.projectName, mongoOrgId);
+
+    // 3.2 Create Cluster
+    const clusterName = `${request.projectName.replace(/\s+/g, '-')}-cluster`;
+    const clusterConfig = {
+      projectName: request.projectName,
+      clusterName,
+      databaseName: request.projectName.replace(/\s+/g, '_').toLowerCase(),
+      region: 'US_EAST_1',
+      tier: 'M0',
+      provider: 'AWS' as const,
+    };
+
+    await mongoService.createCluster(atlasProject.id, clusterConfig);
+
+    // Optional: wait until ready (may take ~10 mins)
+    try {
+      await mongoService.waitForCluster(atlasProject.id, clusterConfig.clusterName, 1800000, 30000);
+    } catch (waitErr) {
+      console.warn('Cluster readiness wait timed out or errored – proceeding anyway:', waitErr);
+    }
+
+    // 3.3 Add IP whitelist (0.0.0.0/0 for dev)
+    await mongoService.addIPWhitelist(atlasProject.id);
+
+    // 3.4 Create DB user
+    const dbUsername = 'app_user';
+    const dbPassword = Math.random().toString(36).slice(-16);
+    await mongoService.createDatabaseUser(atlasProject.id, dbUsername, dbPassword, clusterConfig.databaseName);
+
+    // 3.5 Generate Connection String
+    const clusterInfo = await mongoService.getCluster(atlasProject.id, clusterConfig.clusterName);
+    const connString = mongoService.generateConnectionString(clusterInfo, dbUsername, dbPassword, clusterConfig.databaseName);
+
+    await db.collection('deployments').updateOne(
+      { deploymentId },
+      {
+        $set: {
+          mongodbConnectionString: connString,
+        },
+      }
+    );
+
+    await updateStep('mongodb', { status: 'completed', completedAt: new Date() });
+  } catch (err) {
+    console.error('MongoDB step failed', err);
+    await updateStep('mongodb', { status: 'error', completedAt: new Date(), error: String(err) });
+    await db.collection('deployments').updateOne(
+      { deploymentId },
+      {
+        $set: {
+          status: 'failed',
+          error: String(err),
+          errorStep: 'mongodb',
           completedAt: new Date(),
         },
       }

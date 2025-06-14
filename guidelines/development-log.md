@@ -213,6 +213,17 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 - **Vercel Project**: API creates a `nextjs` project linked to the new GitHub repo and waits for the first deployment to finish.
 - **Progress Updates**: On success, deployment record receives `vercelUrl`; on failure, overall deployment marked `failed` with errorStep `vercel`.
 
+### ✅ MongoDB Atlas Integration (Latest)
+**Description**: Deployment pipeline now provisions a free MongoDB Atlas cluster, creates user and connection string, and stores it in deployment record.
+
+**Files Modified**:
+- `app/api/create-app/route.ts` – Added Atlas integration step, automated project & cluster creation, user provisioning, IP whitelist, connection string generation.
+
+**Architecture Details**:
+- **MongoDBService**: Utilized and integrated existing Atlas SDK wrapper.
+- **Credentials**: Requires `MONGODB_ATLAS_API_KEY`, `MONGODB_PRIVATE_KEY`, and `MONGODB_ORG_ID` env vars.
+- **Deployment Record**: Step `mongodb` tracks progress, and `mongodbConnectionString` stored on completion.
+
 ---
 
 ## 🏗️ Web App Architecture Guide
