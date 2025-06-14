@@ -285,4 +285,13 @@ export class GitHubService {
     if (['package.json', 'next.config.js', 'tsconfig.json', 'tailwind.config.ts'].includes(path)) return 'config';
     return 'other';
   }
+
+  async deleteRepository(repoName: string): Promise<void> {
+    try {
+      await this.octokit.repos.delete({ owner: this.username, repo: repoName });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.warn(`Failed to delete GitHub repository ${repoName}: ${errorMessage}`);
+    }
+  }
 } 
