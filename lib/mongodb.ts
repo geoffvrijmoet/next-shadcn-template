@@ -17,7 +17,7 @@ function parseClusterMap(): ClusterMap {
       return JSON.parse(raw) as ClusterMap;
     } catch (err) {
       throw new Error(`Invalid MONGODB_CLUSTERS JSON: ${(err as Error).message}`);
-    }
+}
   }
   // Fallback to legacy single-URI env var
   if (process.env.MONGODB_URI) {
@@ -61,7 +61,7 @@ export async function getDatabase(
   if (!baseUri) {
     const available = Object.keys(clusterMap).join(', ');
     throw new Error(`Unknown MongoDB cluster key '${clusterKey}'. Available: ${available}`);
-  }
+}
 
   // If consumer already appended a DB name we strip it to re-append cleanly
   const connectionString = baseUri.endsWith('/') ? baseUri.slice(0, -1) : baseUri;

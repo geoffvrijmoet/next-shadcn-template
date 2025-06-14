@@ -24,6 +24,7 @@
     "clsx": "^2.1.1",
     "google-auth-library": "^9.15.0",
     "googleapis": "^144.0.0",
+    "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.468.0",
     "mongodb": "^6.12.0",
@@ -32,10 +33,10 @@
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.5.5",
-    "tailwindcss-animate": "^1.0.7",
-    "js-yaml": "^4.1.0"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

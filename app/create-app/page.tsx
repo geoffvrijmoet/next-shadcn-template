@@ -281,15 +281,15 @@ export default function CreateAppPage() {
               <Select value={form.targetCluster} onValueChange={(value) => setForm(prev => ({ ...prev, targetCluster: value }))} disabled={clusterOptions.length === 0}>
                 <SelectTrigger id="targetCluster">
                   <SelectValue placeholder="Select cluster" />
-                </SelectTrigger>
-                <SelectContent>
+              </SelectTrigger>
+              <SelectContent>
                   {clusterOptions.map((cluster) => (
                     <SelectItem key={cluster.id} value={cluster.id}>
                       {cluster.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             </div>
           </CardContent>
         </Card>
@@ -303,19 +303,19 @@ export default function CreateAppPage() {
             <div className="space-y-4">
               {services.map(service => (
                 <div key={service.name}>
-                  <label
-                    className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-colors ${
+                <label
+                  className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-colors ${
                       service.children
                         ? areAllChildrenSelected(service.children)
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
                         : form.features.includes(service.name)
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
                       checked={service.children ? areAllChildrenSelected(service.children) : form.features.includes(service.name)}
                       onChange={() => {
                         if (service.children) {
@@ -324,21 +324,21 @@ export default function CreateAppPage() {
                           handleFeatureToggle(service.name);
                         }
                       }}
-                      className="sr-only"
-                    />
-                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                    className="sr-only"
+                  />
+                  <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
                       service.children
                         ? areAllChildrenSelected(service.children)
                           ? 'border-blue-500 bg-blue-500'
                           : 'border-gray-300'
                         : form.features.includes(service.name)
-                          ? 'border-blue-500 bg-blue-500'
-                          : 'border-gray-300'
-                    }`}>
+                      ? 'border-blue-500 bg-blue-500'
+                      : 'border-gray-300'
+                  }`}>
                       {(service.children ? areAllChildrenSelected(service.children) : form.features.includes(service.name)) && (
-                        <CheckCircle className="w-3 h-3 text-white" />
-                      )}
-                    </div>
+                      <CheckCircle className="w-3 h-3 text-white" />
+                    )}
+                  </div>
                     <span className="text-sm font-medium">{service.name}</span>
                   </label>
 
@@ -369,7 +369,7 @@ export default function CreateAppPage() {
                             )}
                           </div>
                           <span>{child}</span>
-                        </label>
+                </label>
                       ))}
                     </div>
                   )}
