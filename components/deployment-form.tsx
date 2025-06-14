@@ -48,7 +48,7 @@ export function DeploymentForm() {
       const result: DeploymentResult = await response.json();
       
       if (!response.ok) {
-        throw new Error(result.error || 'Deployment failed');
+        throw new Error((result as any).error || 'Deployment failed');
       }
 
       setDeploymentResult(result);
