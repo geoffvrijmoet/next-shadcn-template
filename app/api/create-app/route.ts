@@ -3,6 +3,7 @@ import getDatabase from '@/lib/mongodb';
 import { GitHubService } from '@/lib/services/github';
 import { VercelService } from '@/lib/services/vercel';
 import { MongoDBService } from '@/lib/services/mongodb';
+import { ClerkService } from '@/lib/services/clerk';
 
 interface CreateAppRequest {
   projectName: string;
@@ -105,6 +106,13 @@ async function createDeploymentRecord(request: CreateAppRequest): Promise<string
     {
       id: 'mongodb',
       name: 'Provision MongoDB Atlas Cluster',
+      status: 'pending' as const,
+      startedAt: undefined,
+      completedAt: undefined,
+    },
+    {
+      id: 'clerk',
+      name: 'Create Clerk Application',
       status: 'pending' as const,
       startedAt: undefined,
       completedAt: undefined,
@@ -349,6 +357,59 @@ async function initiateDeployment(
           status: 'failed',
           error: String(err),
           errorStep: 'mongodb',
+          completedAt: new Date(),
+        },
+      }
+    );
+    return;
+  }
+
+  // 4. Create Clerk application
+  try {
+    await updateStep('clerk', { status: 'in-progress', startedAt: new Date() });
+
+    const clerkSecret = apiKeys.clerk;
+    if (!clerkSecret) {
+      throw new Error('Missing CLERK_API_KEY env variable');
+    }
+
+    const clerkService = new ClerkService(clerkSecret);
+
+    // Create application (using projectName as name) and domain if provided
+    const clerkApp = await clerkService.createApplication({
+      applicationName: request.projectName,
+      domain: request.domain,
+      features: [],
+    });
+
+    // Setup default configuration
+    await clerkService.setupDefaultConfiguration(clerkApp.id, request.domain);
+
+    // Generate API keys
+    const { publishableKey, secretKey } = await clerkService.createAPIKeys(clerkApp.id);
+
+    await db.collection('deployments').updateOne(
+      { deploymentId },
+      {
+        $set: {
+          clerkApplicationId: clerkApp.id,
+          clerkPublishableKey: publishableKey,
+          clerkSecretKey: secretKey,
+        },
+      }
+    );
+
+    await updateStep('clerk', { status: 'completed', completedAt: new Date() });
+  } catch (err) {
+    console.error('Clerk step failed', err);
+    await updateStep('clerk', { status: 'error', completedAt: new Date(), error: String(err) });
+    await db.collection('deployments').updateOne(
+      { deploymentId },
+      {
+        $set: {
+          status: 'failed',
+          error: String(err),
+          errorStep: 'clerk',
           completedAt: new Date(),
         },
       }

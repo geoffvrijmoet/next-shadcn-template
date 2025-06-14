@@ -19,7 +19,7 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 - [ ] **🔧 Web App Generator - Core Infrastructure**: Complete the infrastructure orchestration for the web app generator:
   - ~~Implement GitHub API integration for repository creation~~ ✅
   - ~~Add Vercel API integration for automated deployments~~ ✅
-  - Create MongoDB Atlas API integration for database setup
+  - ~~Create MongoDB Atlas API integration for database setup~~ ✅
   - Implement Clerk API integration for auth project creation
   - Add Google Cloud API integration for project setup
   - Create real-time WebSocket updates for deployment progress
@@ -223,6 +223,17 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 - **MongoDBService**: Utilized and integrated existing Atlas SDK wrapper.
 - **Credentials**: Requires `MONGODB_ATLAS_API_KEY`, `MONGODB_PRIVATE_KEY`, and `MONGODB_ORG_ID` env vars.
 - **Deployment Record**: Step `mongodb` tracks progress, and `mongodbConnectionString` stored on completion.
+
+### ✅ Clerk Auth Integration (Latest)
+**Description**: Added automated Clerk application provisioning as part of deployment pipeline.
+
+**Files Modified**:
+- `app/api/create-app/route.ts` – New Clerk step with default config, API key generation, and deployment record updates.
+
+**Architecture Details**:
+- **ClerkService**: Utilized client to create instance, configure defaults, generate publishable & secret keys.
+- **Environment**: Requires `CLERK_API_KEY` env var.
+- **Deployment Record**: Stores `clerkApplicationId`, `clerkPublishableKey`, `clerkSecretKey` and step status.
 
 ---
 
