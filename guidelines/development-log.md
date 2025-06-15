@@ -240,6 +240,19 @@ This file serves as both a **to-do list for AI agents** and a **comprehensive gu
 - Used `[, value]` destructuring in filter to avoid unused variable.
 - Added `void _apiKeys;` inside `initiateDeployment` to mark upcoming usage.
 
+### ✅ Landing Pages Design Enhancement (Latest)
+**Description**: Added visually rich, gradient-based marketing landing pages with glass-morphism cards, feature icons, and modern UI elements for three products.
+
+**Files Created**:
+- `app/(marketing)/retainboost/page.tsx`
+- `app/(marketing)/boardmate/page.tsx`
+- `app/(marketing)/hackspark/page.tsx`
+
+**Architecture Details**:
+- **Visual Design**: Utilises Tailwind gradients (`bg-gradient-to-br`), backdrop blur for glass-morphism, and lucide-react icons.
+- **Content**: Preserves existing copy while enhancing layout and interactivity.
+- **Reusability**: Each page structured with hero, feature grid, and pricing/actions for easy cloning to future marketing pages.
+
 ---
 
 ## 🏗️ Web App Architecture Guide
